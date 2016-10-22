@@ -23,7 +23,6 @@ module.exports = function (app) {
             else if(!user){
                 console.log("no earlier user found,creating new user");
                 var newUser=new User();
-                newUser.name=event.name;
                 newUser.userId=event.userId;
                 newUser.userToken=event.userToken;
                 newUser.stocksSubscribed=[];
@@ -32,6 +31,7 @@ module.exports = function (app) {
                     if(err) console.error(err);
                     else if(!user) console.error("unable to save user successfully");
                     else{
+                        console.log("Reached here yayyy");
                         addStocks(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
                     }
                 });
@@ -45,24 +45,29 @@ module.exports = function (app) {
     });
 };
 
+var getStockPrices = function(stockObj, user) {
+    stockUtils.getCurrentPrice(stockObj.name,stockObj.exchange,function(err,currPrice){
+        if(err) {console.error(err)}
+        else{
+            console.log(currPrice + " " + stockObj);
+            if(currPrice==0) {
+                currPrice = "NaN";
+            }
+            user.stocksSubscribed.push({
+                name:stockObj.name,
+                exchange:stockObj.exchange,
+                lastPrice:currPrice,
+                percentChange:0,
+                updatedAt:Date.now()
+            });
+            user.save(function(err){if(err) console.error(err);});
+        }
+    });
+}
+
 var addStocks = function(user,stockObjArray){
     //(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
     for(var i=0;i<stockObjArray.length;i++){
-        stockUtils.getCurrentPrice(user.stocksSubscribed[stockIndex].name,user.stocksSubscribed[stockIndex].exchange,function(err,currPrice){
-            if(err) {console.error(err)}
-            else{
-                if(currPrice=0) {
-                    currPrice = "NaN";
-                }
-                user.stocksSubscribed.push({
-                    name:stockObjArray[i].name,
-                    exchange:stockObjArray[i].exchange,
-                    lastPrice:currPrice,
-                    percentChange:0,
-                    updatedAt:Date.now()
-                });
-                user.save(function(err){if(err) console.error(err);});
-            }
-        });
+        getStockPrices(stockObjArray[i], user);
     }
 }

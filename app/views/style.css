@@ -1,15 +1,13 @@
 .web-live-container-1 {
-	width: 90%;
 	min-height: 30px !important;
 	border-top: thin solid #81888e;
 	border-bottom: thin solid #81888e;
 	font-family: "Varela Round";
 	font-size: 120%;
-	padding: 7px 2px 2px 22px;
+	padding: 7px 2px 2px 21px;
 	color: #81888e;
 }
 .web-live-container-2 {
-	width: 90%;
 	min-height: 30px !important;
 	border-bottom: thin solid #81888e;
 	font-family: "Varela Round";

@@ -44,7 +44,7 @@ module.exports = function (app) {
                     stockUtils.getCurrentPrice(stockName,stockExchange,function(err,currPrice){
                         if(err) {console.error(err);res.json({success:false,error:err})}
                         else{
-                            if(currPrice=0)
+                            if(currPrice==0)
                                 currPrice="NaN";
                             user.stocksSubscribed.push({
                                 name:stockName,
@@ -96,7 +96,7 @@ module.exports = function (app) {
             if(err) {console.error(err)}
             else{
                 var prevPrice=user.stocksSubscribed[stockIndex].lastPrice;
-                if(currPrice=0) {
+                if(currPrice==0) {
                     currPrice = "NaN";
                     var percentChange = 0;
                 }

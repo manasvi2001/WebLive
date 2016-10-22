@@ -50,7 +50,7 @@ console.log('The magic happens on port ' + port);
 
 app.get('/abc', function(req, res) {
 	console.log('Success');
-    res.json({success: true, message: "Fuck you"});
+    res.json({success: true, message: "Yayy"});
 });
 
 app.get('/liveWidget', function(req,res) {
