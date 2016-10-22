@@ -3,7 +3,7 @@ module.exports = function (app) {
         res.json({success:true});
     })
 
-    app.get('/install',function(req,res){
+    app.get('/events',function(req,res){
 
     })
 }
