@@ -101,7 +101,7 @@ module.exports = function (app) {
                     var percentChange = 0;
                 }
                 else{
-                    if(prevPrice==0){
+                    if(prevPrice==0 || prevPrice=="NaN"){
                         var percentChange = 0;
                     }
                     else{

@@ -1,4 +1,5 @@
 var User = require('./../models/user');
+var stockUtils = require('./../utils/stockUtils.js');
 
 module.exports = function (app) {
     //flock credentials
@@ -27,7 +28,13 @@ module.exports = function (app) {
                 newUser.userToken=event.userToken;
                 newUser.stocksSubscribed=[];
                 //TODO:initialise subscribed news
-                newUser.save(function(err){if(err) console.error(err);});
+                newUser.save(function(err,user){
+                    if(err) console.error(err);
+                    else if(!user) console.error("unable to save user successfully");
+                    else{
+                        addStocks(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
+                    }
+                });
                 return {success:true}
             }
             else{
@@ -36,4 +43,26 @@ module.exports = function (app) {
             }
         })
     });
+};
+
+var addStocks = function(user,stockObjArray){
+    //(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
+    for(var i=0;i<stockObjArray.length;i++){
+        stockUtils.getCurrentPrice(user.stocksSubscribed[stockIndex].name,user.stocksSubscribed[stockIndex].exchange,function(err,currPrice){
+            if(err) {console.error(err)}
+            else{
+                if(currPrice=0) {
+                    currPrice = "NaN";
+                }
+                user.stocksSubscribed.push({
+                    name:stockObjArray[i].name,
+                    exchange:stockObjArray[i].exchange,
+                    lastPrice:currPrice,
+                    percentChange:0,
+                    updatedAt:Date.now()
+                });
+                user.save(function(err){if(err) console.error(err);});
+            }
+        });
+    }
 }

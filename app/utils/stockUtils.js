@@ -1,4 +1,3 @@
-var User        = require('./../models/user');
 var request     = require("request");
 
 exports.getCurrentPrice = function getCurrentPrice(name,exchange,callback){
@@ -20,3 +19,4 @@ exports.getCurrentPrice = function getCurrentPrice(name,exchange,callback){
         return callback(null,newPrice);
     });
 };
+
