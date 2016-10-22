@@ -22,8 +22,8 @@
 			<div class="stock-live-container-1" ng-repeat="stock in stockData">
 				<span ng-if="editStock"><i class="ion-minus-circled"></i></span>
 				<span class="stock-live-name">{{stock.name}}</span>
-				<span class="stock-live-differential" align="center">&nbsp;{{stock.percentChange}} %&nbsp;</span>
-				<span class="stock-live-dummy" align="center">&nbsp;&nbsp;</span>
+				<span class="stock-live-differential" align="center" ng-if="stock.percentChange>=0">&nbsp;{{stock.percentChange}} %&nbsp;</span>
+				<span class="stock-live-differential-negative" align="center" ng-if="stock.percentChange<0">&nbsp;{{stock.percentChange}} %&nbsp;</span>
 				<span class="stock-live-price" align="center">{{stock.lastPrice}}&nbsp;&nbsp;&nbsp;</span>
 			</div>
 		</div>

@@ -88,7 +88,7 @@ webLiveApp
 				.success(function(data) {
 					console.log(JSON.stringify(data));
 					$rootScope.safeApply(function() {
-						$scope.stockData = data.stock;
+						$scope.stockData = data.stocks;
 					});
 				})
 				.error(function(error) {

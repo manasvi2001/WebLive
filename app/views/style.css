@@ -20,6 +20,7 @@ body {
 }
 .stock-live-container-1 {
 	font-family: "Varela Round";
+	font-size: 90%;
 	padding: 10px;
 	padding-left: 22px;
 }
@@ -30,15 +31,18 @@ body {
 	float: right;
 	width: 40%;
 }
-.stock-live-dummy {
-	float: right;
-	width: 10%;
-}
 .stock-live-differential {
 	float: right;
-	width: 20%;
+	width: 30%;
 	border: thin solid #6ada39;
 	background-color: #6ada39;
+	border-radius: 2px;
+}
+.stock-live-differential-negative {
+	float: right;
+	width: 30%;
+	border: thin solid #ed473a;
+	background-color: #ed473a;
 	border-radius: 2px;
 }
 

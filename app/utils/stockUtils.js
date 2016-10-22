@@ -29,7 +29,7 @@ exports.getCurrentPrice = function getCurrentPrice(name,exchange,stock,callback)
         stock.name=name;
         stock.exchange=exchange;
         stock.lastPrice=closePrice;
-        stock.percentChange= percentChange;
+        stock.percentChange= percentChange.toFixed(4);
         stock.updatedAt = Date.now();
         stock.save(function(err){if(err) console.error(err);});
         return callback(null,closePrice,percentChange);
