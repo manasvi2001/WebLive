@@ -1,4 +1,7 @@
 {
+  "name":"flockWithVibrance",
+  "version":"0.0.1",
+  "main": "server.js",
   "dependencies": {
     "express": "^4.14.0"
   }
