@@ -122,7 +122,7 @@ module.exports = function (app) {
         });
     };
 
-    //setInterval(function() {
-    //    updateAllStocks();
-    //},1000*60);
+    setInterval(function() {
+       updateAllStocks();
+    },1000*60);
 };

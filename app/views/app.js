@@ -4,13 +4,31 @@ webLiveApp
 	.constant("SERVER_CONFIG", {
     "url": "http://172.16.67.209:9000"
   })
-	.controller('MainController', ['$scope', '$interval', '$http', 'SERVER_CONFIG', 'SettingsService',
-	 	function($scope, $interval, $http, SERVER_CONFIG, SettingsService) {
+	.controller('MainController', ['$scope', '$rootScope', '$interval', '$http', 'SERVER_CONFIG', 'SettingsService',
+	 	function($scope, $rootScope, $interval, $http, SERVER_CONFIG, SettingsService) {
+	 	$rootScope.safeApply = function(fn) {
+      var phase = this.$root.$$phase;
+      if(phase == '$apply' || phase == '$digest') {
+        if(fn && (typeof(fn) === 'function')) {
+          fn();
+        }
+      } else {
+        this.$apply(fn);
+      }
+    };
+    $scope.input = {
+    	percentage: '0.5'
+    };
 		$scope.stockData = [];
 		$scope.settingsView = false;
+		$scope.editStock = false;
+		$scope.setThreshold = function() {
+			console.log("pressed enter");
+			// set threshold
+		}
 		$scope.openSettings = function() {
 			console.log("Opens Setting");
-			// $scope.settingsView = true;
+			$scope.settingsView = true;
 			// $scope.selectedTopics = SettingsService.getNewsTopics();
 			// var parameters = {
 			// 	userId: $scope.userId,
@@ -23,9 +41,15 @@ webLiveApp
 			// 		if(numberWidgetUsed == 0) {
 			// 			SettingsService.setNewsTopics(topics);
 			// 		} else {
-
 			// 		}
-			// 		SettingsService.setNumberWidgetUsed(numberWidgetUsed+1);
+			// 		SettingsService.setNumberWidgetUsed();
+			// 	});
+			// $http.get(SERVER_CONFIG.url + '/allStocks', {params: parameters})
+			// 	.success(function(data) {
+			// 		var topics = data.topics;
+			// 		var numberWidgetUsed = SettingsService.getNumberWidgetUsed()
+			// 		SettingsService.setNewsTopics(topics);
+			// 		SettingsService.setNumberWidgetUsed();
 			// 	});
 		}
 		$scope.goToHome = function() {
@@ -49,7 +73,9 @@ webLiveApp
 		$http.get(SERVER_CONFIG.url + '/stock', {params: parameters})
 				.success(function(data) {
 					console.log(JSON.stringify(data));
-					$scope.stockData = data.stock;
+					$rootScope.safeApply(function() {
+						$scope.stockData = data.stocks;
+					});
 				})
 				.error(function(error) {
 					console.log(JSON.stringify(error));
@@ -61,12 +87,14 @@ webLiveApp
 			$http.get(SERVER_CONFIG.url + '/stock', {params: parameters})
 				.success(function(data) {
 					console.log(JSON.stringify(data));
-					$scope.stockData = data.stock;
+					$rootScope.safeApply(function() {
+						$scope.stockData = data.stock;
+					});
 				})
 				.error(function(error) {
 					console.log(JSON.stringify(error));
 				})
-		}, 600000);
+		}, 60000);
 		// $interval(function() {
 		// 	var parameters = {
 		// 		userId: $scope.userId
@@ -90,5 +118,24 @@ webLiveApp
 		settings.getNewsTopics = function() {
 			return newsTopics;
 		};
+		settings.setNumberWidgetUsed = function() {
+			numberWidgetUsed += 1;
+		};
+		settings.getNumberWidgetUsed = function() {
+			return numberWidgetUsed;
+		};
 		return settings;
-	}]);
+	}])
+	.directive('myEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.myEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
+	});

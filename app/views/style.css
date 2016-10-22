@@ -18,3 +18,39 @@
 body {
 	margin: 0;
 }
+.stock-live-container-1 {
+	font-family: "Varela Round";
+	padding: 10px;
+	padding-left: 22px;
+}
+.stock-live-name {
+	width: 30%;
+}
+.stock-live-price {
+	float: right;
+	width: 40%;
+}
+.stock-live-dummy {
+	float: right;
+	width: 10%;
+}
+.stock-live-differential {
+	float: right;
+	width: 20%;
+	border: thin solid #6ada39;
+	background-color: #6ada39;
+	border-radius: 2px;
+}
+
+.settings-box {
+	font-family: "Varela Round";
+	padding: 5px;
+}
+
+.input-box {
+	width: 30px;
+}
+
+.input-box-container {
+	padding-left: 20px;
+}

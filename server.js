@@ -6,6 +6,7 @@ var express  = require('express');
 var app      = express();
 var port     = process.env.PORT || 9000;
 var mongoose = require('mongoose');
+var request  = require('request');
 
 var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
@@ -41,7 +42,7 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 // routes ======================================================================
 require('./app/routes/login.js')(app); // load our routes and pass in our app and fully configured passport
-require('./app/routes/flockEvents.js')(app);
+require('./app/routes/flockEvents.js')(app, request);
 require('./app/routes/stocks.js')(app);
 
 // launch ======================================================================

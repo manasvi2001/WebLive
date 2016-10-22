@@ -1,7 +1,7 @@
 var User = require('./../models/user');
 var stockUtils = require('./../utils/stockUtils.js');
 
-module.exports = function (app) {
+module.exports = function (app, request) {
     //flock credentials
     var flock = require('flockos');
 
@@ -13,6 +13,36 @@ module.exports = function (app) {
 
     //middleware to verify tokens
     //app.use(flock.eventTokenChecker);
+
+    var sendMessage = function(userId, token, company) {
+    	var options = {
+    		url: "https://api.flock.co/v1/chat.sendMessage",
+    		json: {
+			    'to': userId,
+			    'token': token,
+			    'text': 'Stock Price of ' + company.toUpperCase(),
+			    'attachments': [{
+			    	'title': 'Stock Price of ' + company.toUpperCase(),
+			    	'views': {
+			    		'flockml': "<flockml>Hello <strong>foobar</strong>, Welcome to <a href=\"https://flock.co/\">Flock!</a></flockml>"
+			    	},
+			    	"buttons": [{
+			        "name": "View details",
+			        "action": { "type": "openWidget", "desktopType": "modal", "mobileType": "modal", "url": "http://172.16.67.209:9000/graph" }
+				    }]
+			    }]
+			  }
+    	}
+			request(options, function(error, response, body) {
+				if(error) {
+					return console.log('Error: ' + error);
+				}
+				if(response.statusCode != 200) {
+					return console.log('Invalid' + response.statusCode);
+				}
+				console.log(body);
+			});
+		}
 
     app.post('/events', flock.router);
 
@@ -43,6 +73,44 @@ module.exports = function (app) {
                 return {success:true};
             }
         })
+    });
+
+    flock.events.on('client.slashCommand', function(event) {
+        console.log('client.slashCommand called with :: ' + JSON.stringify(event));
+        if(event.text)
+        	var company = event.text.slice(1);
+        User.findOne({'userId': event.userId}, function(err, user) {
+        	if(err) console.error(err);
+        	var token = user.userToken;
+	        if(event.chat[0] == 'g'){
+	            //get group info
+	            request('https://api.flock.co/v1/groups.getMembers?groupId=' + event.chat + '&token=' + token, function (error, response, body) {
+							    //Check for error
+							    if(error){
+							        return console.log('Error:', error);
+							    }
+
+							    //Check for right status code
+							    if(response.statusCode !== 200){
+							        return console.log('Invalid Status Code Returned:', response.statusCode);
+							    }
+
+							    body=JSON.parse(body);
+
+							    for(var i=0;i<body.length;i++) {
+							    	sendMessage(body[i].id,token,company);
+							    }
+
+							    //All is good. Print the body
+							    console.log(body); // Show the HTML for the Modulus homepage.
+
+							});
+	        }
+	        else {
+	        	sendMessage(event.chat,token,company);
+	        }
+        })
+        return {success: true};
     });
 };
 
