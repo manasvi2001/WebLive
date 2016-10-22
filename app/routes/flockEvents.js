@@ -26,6 +26,11 @@ module.exports = function (app) {
                 newUser.userId=event.userId;
                 newUser.userToken=event.userToken;
                 newUser.stocksSubscribed=[];
+
+/*                newUser.stocksSubscribed.push({name:"GOOGL",exchange:"NASDAQ"});
+                newUser.stocksSubscribed.push({name:"IDEA",exchange:"NSE"});
+                newUser.stocksSubscribed.push({name:"AAPL",exchange:"NASDAQ"});*/
+
                 //TODO:initialise subscribed news
                 newUser.save(function(err,user){
                     if(err) console.error(err);
@@ -45,29 +50,23 @@ module.exports = function (app) {
     });
 };
 
-var getStockPrices = function(stockObj, user) {
-    stockUtils.getCurrentPrice(stockObj.name,stockObj.exchange,function(err,currPrice){
-        if(err) {console.error(err)}
-        else{
-            console.log(currPrice + " " + stockObj);
-            if(currPrice==0) {
-                currPrice = "NaN";
-            }
-            user.stocksSubscribed.push({
-                name:stockObj.name,
-                exchange:stockObj.exchange,
-                lastPrice:currPrice,
-                percentChange:0,
-                updatedAt:Date.now()
-            });
-            user.save(function(err){if(err) console.error(err);});
-        }
-    });
-}
-
 var addStocks = function(user,stockObjArray){
     //(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
     for(var i=0;i<stockObjArray.length;i++){
-        getStockPrices(stockObjArray[i], user);
+        stockUtils.getCurrentPrice(stockObjArray[i].name,stockObjArray[i].exchange)
+            .then(function (newPrice,percentChange) {
+                console.log("get result from util function of price & percent of ",stockObjArray[i].name,newPrice,percentChange);
+                user.stocksSubscribed.push({
+                    name:stockObjArray[i].name,
+                    exchange:stockObjArray[i].exchange,
+                    lastPrice:newPrice,
+                    percentChange:percentChange,
+                    updatedAt:Date.now()
+                });
+            }, function (error) {
+                console.error(error);
+            });
     }
+    console.log("final user->",JSON.stringify(user));
+    user.save(function(err){if(err) console.error(err);});
 }

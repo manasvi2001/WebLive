@@ -41,22 +41,21 @@ module.exports = function (app) {
                     }
                 }
                 if(!alreadyAddedFlag){
-                    stockUtils.getCurrentPrice(stockName,stockExchange,function(err,currPrice){
-                        if(err) {console.error(err);res.json({success:false,error:err})}
-                        else{
-                            if(currPrice==0)
-                                currPrice="NaN";
+                    stockUtils.getCurrentPrice(stockName,stockExchange)
+                        .then(function (newPrice,percentChange) {
                             user.stocksSubscribed.push({
                                 name:stockName,
                                 exchange:stockExchange,
-                                lastPrice:currPrice,
-                                percentChange:0,
+                                lastPrice:newPrice,
+                                percentChange:percentChange,
                                 updatedAt:Date.now()
                             });
                             user.save(function(err){if(err) console.error(err);});
-                            res.json({success:true,message:"stock added successfully",lastPrice:currPrice});
-                        }
-                    });
+                            res.json({success:true,message:"stock added successfully",lastPrice:newPrice,percentChange:percentChange});
+                        }, function (error) {
+                            // All of the promises were rejected.
+                            console.error(error);res.json({success:false,error:error})
+                        });
                 }
             }
         })
@@ -91,34 +90,6 @@ module.exports = function (app) {
         })
 
     });
-    var updateSelectedStock = function(user,stockIndex){
-        stockUtils.getCurrentPrice(user.stocksSubscribed[stockIndex].name,user.stocksSubscribed[stockIndex].exchange,function(err,currPrice){
-            if(err) {console.error(err)}
-            else{
-                var prevPrice=user.stocksSubscribed[stockIndex].lastPrice;
-                if(currPrice==0) {
-                    currPrice = "NaN";
-                    var percentChange = 0;
-                }
-                else{
-                    if(prevPrice==0 || prevPrice=="NaN"){
-                        var percentChange = 0;
-                    }
-                    else{
-                        var percentChange=(currPrice-prevPrice)/prevPrice;
-                    }
-                }
-                user.stocksSubscribed[stockIndex] = {
-                    name:user.stocksSubscribed[stockIndex].name,
-                    exchange:user.stocksSubscribed[stockIndex].exchange,
-                    lastPrice:currPrice,
-                    percentChange:percentChange,
-                    updatedAt:Date.now()
-                };
-                user.save(function(err){if(err) console.error(err);});
-            }
-        });
-    };
 
     var updateAllStocks = function() {
         User.find(function(err,users){
@@ -128,15 +99,30 @@ module.exports = function (app) {
             else {
                 console.log("number of users->",users.length);
                 for(var i=0;i<users.length;i++){
-                    for(var j=0;j<users[i].stocksSubscribed.length;j++){
-                        updateSelectedStock(users[i],j);
+                    var currUser=users[i];
+                    for(var j=0;j<currUser.stocksSubscribed.length;j++){
+                        stockUtils.getCurrentPrice(currUser.stocksSubscribed[j].name,currUser.stocksSubscribed[j].exchange)
+                            .then(function (newPrice,percentChange) {
+                                // Any of the promises was fulfilled.
+                                currUser.stocksSubscribed[j] = {
+                                    name:currUser.stocksSubscribed[j].name,
+                                    exchange:currUser.stocksSubscribed[j].exchange,
+                                    lastPrice:newPrice,
+                                    percentChange:percentChange,
+                                    updatedAt:Date.now()
+                                };
+                            }, function (error) {
+                                // All of the promises were rejected.
+                                console.error(error)
+                            });
                     }
+                    currUser.save(function(err){if(err) console.error(err);});
                 }
             }
         });
     };
 
-    setInterval(function() {
-        updateAllStocks();
-    },1000*60);
+    //setInterval(function() {
+    //    updateAllStocks();
+    //},1000*60);
 };

@@ -9,6 +9,7 @@
     "express-session": "^1.14.1",
     "flockos": "github:flockchat/flockos-node-sdk",
     "mongoose": "^4.6.4",
+    "q": "^1.4.1",
     "request": "^2.75.0"
   }
 }
