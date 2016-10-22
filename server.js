@@ -14,7 +14,20 @@ var session      = require('express-session');
 var configDB = require('./config/database.js');
 
 // configuration ===============================================================
-// mongoose.connect(configDB.db); // connect to our database
+mongoose.connect(configDB.db); // connect to our database
+
+app.all('*',function(req, res, next) {
+    res.header('Access-Control-Allow-Methods','GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    if (req.method == 'OPTIONS') {
+        res.status(200).end();
+    } else {
+        next();
+    }
+    //next();
+});
 
 // require('./config/passport')(passport); // pass passport for configuration
 
@@ -29,13 +42,15 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 // routes ======================================================================
 require('./app/routes/login.js')(app); // load our routes and pass in our app and fully configured passport
 require('./app/routes/flockEvents.js')(app);
+require('./app/routes/stocks.js')(app);
 
 // launch ======================================================================
 app.listen(port);
 console.log('The magic happens on port ' + port);
 
-app.get('/', function(req, res) {
-    res.send('Hello! The API is at http://localhost:' + port + '/api');
+app.get('/abc', function(req, res) {
+	console.log('Success');
+    res.json({success: true, message: "Fuck you"});
 });
 
 app.get('/liveWidget', function(req,res) {

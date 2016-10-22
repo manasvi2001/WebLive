@@ -1,9 +1,10 @@
 var User       = require('./../models/user');
-var stocksUtil = require('./../utils/stocksUtils.js');
+var stockUtils = require('./../utils/stockUtils.js');
 
 module.exports = function (app) {
     app.get("/stock",function(req,res){
         var userId = req.body.userId || req.query.userId;
+        console.log(userId);
         if(!userId)
             return res.status(403).send({success: false, message: 'no userId provided'});
 
@@ -40,7 +41,7 @@ module.exports = function (app) {
                     }
                 }
                 if(!alreadyAddedFlag){
-                    stocksUtil.getCurrentPrice(stockName,stockExchange,function(err,currPrice){
+                    stockUtils.getCurrentPrice(stockName,stockExchange,function(err,currPrice){
                         if(err) {console.error(err);res.json({success:false,error:err})}
                         else{
                             if(currPrice=0)
@@ -91,7 +92,7 @@ module.exports = function (app) {
 
     });
     var updateSelectedStock = function(user,stockIndex){
-        stocksUtil.getCurrentPrice(user.stocksSubscribed[stockIndex].name,user.stocksSubscribed[stockIndex].exchange,function(err,currPrice){
+        stockUtils.getCurrentPrice(user.stocksSubscribed[stockIndex].name,user.stocksSubscribed[stockIndex].exchange,function(err,currPrice){
             if(err) {console.error(err)}
             else{
                 var prevPrice=user.stocksSubscribed[stockIndex].lastPrice;
@@ -119,7 +120,7 @@ module.exports = function (app) {
         });
     };
 
-    var updateAllStocks = function(){
+    var updateAllStocks = function() {
         User.find(function(err,users){
             if(err)
                 console.error(err);
@@ -135,5 +136,7 @@ module.exports = function (app) {
         });
     };
 
-    setInterval(updateAllStocks(),1000*60);
+    setInterval(function() {
+        updateAllStocks();
+    },1000*60);
 };

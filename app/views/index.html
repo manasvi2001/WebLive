@@ -21,6 +21,9 @@
 			<div class="web-live-container-1">
 				<i class="ion-arrow-graph-up-right" style="color: limegreen;"></i>&nbsp;Stocks
 			</div>
+			<div ng-repeat="stock in stockData">
+				<pre>{{stock | json}}</pre>
+			</div>
 		</div>
 		<div ng-if="settingsView" ng-click="goToHome()">
 			
