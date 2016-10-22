@@ -14,7 +14,7 @@ var session      = require('express-session');
 var configDB = require('./config/database.js');
 
 // configuration ===============================================================
-mongoose.connect(configDB.db); // connect to our database
+// mongoose.connect(configDB.db); // connect to our database
 
 // require('./config/passport')(passport); // pass passport for configuration
 
@@ -37,3 +37,7 @@ console.log('The magic happens on port ' + port);
 app.get('/', function(req, res) {
     res.send('Hello! The API is at http://localhost:' + port + '/api');
 });
+
+app.get('/liveWidget', function(req,res) {
+	res.sendfile('./app/views/index.html');
+})
