@@ -27,10 +27,6 @@ module.exports = function (app) {
                 newUser.userToken=event.userToken;
                 newUser.stocksSubscribed=[];
 
-/*                newUser.stocksSubscribed.push({name:"GOOGL",exchange:"NASDAQ"});
-                newUser.stocksSubscribed.push({name:"IDEA",exchange:"NSE"});
-                newUser.stocksSubscribed.push({name:"AAPL",exchange:"NASDAQ"});*/
-
                 //TODO:initialise subscribed news
                 newUser.save(function(err,user){
                     if(err) console.error(err);
@@ -51,7 +47,6 @@ module.exports = function (app) {
 };
 
 var addStocks = function(user,stockObjArray){
-    //(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
     for(var i=0;i<stockObjArray.length;i++){
         stockUtils.getCurrentPrice(stockObjArray[i].name,stockObjArray[i].exchange)
             .then(function (newPrice,percentChange) {
