@@ -7,9 +7,7 @@ var userSchema = mongoose.Schema({
     stocksSubscribed:[{
         name:String,
         exchange:String,
-        lastPrice:Number,
-        percentChange:Number,
-        updatedAt:Date
+        stockId:String
     }]
 });
 

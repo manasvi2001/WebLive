@@ -1,4 +1,5 @@
 var User = require('./../models/user');
+var Stock = require('./../models/stock');
 var stockUtils = require('./../utils/stockUtils.js');
 
 module.exports = function (app) {
@@ -48,19 +49,15 @@ module.exports = function (app) {
 
 var addStocks = function(user,stockObjArray){
     for(var i=0;i<stockObjArray.length;i++){
-        stockUtils.getCurrentPrice(stockObjArray[i].name,stockObjArray[i].exchange)
-            .then(function (newPrice,percentChange) {
-                console.log("get result from util function of price & percent of ",stockObjArray[i].name,newPrice,percentChange);
-                user.stocksSubscribed.push({
-                    name:stockObjArray[i].name,
-                    exchange:stockObjArray[i].exchange,
-                    lastPrice:newPrice,
-                    percentChange:percentChange,
-                    updatedAt:Date.now()
-                });
-            }, function (error) {
-                console.error(error);
-            });
+        var newStock = new Stock();
+        user.stocksSubscribed.push({
+            name:stockObjArray[i].name,
+            exchange:stockObjArray[i].exchange,
+            stockId:newStock._id.toString()});
+        stockUtils.getCurrentPrice(stockObjArray[i].name,stockObjArray[i].exchange,newStock,function(err,newPrice,percentChange) {
+            if (err)console.error(err);
+            console.log("got result from util function of price & percent of ", newPrice, percentChange);
+        });
     }
     console.log("final user->",JSON.stringify(user));
     user.save(function(err){if(err) console.error(err);});
