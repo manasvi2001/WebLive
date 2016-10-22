@@ -1,3 +1,5 @@
+var User = require('./../models/user');
+
 module.exports = function (app) {
     //flock credentials
     var flock = require('flockos');
@@ -15,8 +17,23 @@ module.exports = function (app) {
 
     flock.events.on('app.install', function (event) {
         console.log("app.install called with->",JSON.stringify(event));
-        return {
-            success:true
-        }
+        User.findOne({'userId': event.userId},function(err,user){
+            if(err)console.error(err);
+            else if(!user){
+                console.log("no earlier user found,creating new user");
+                var newUser=new User();
+                newUser.name=event.name;
+                newUser.userId=event.userId;
+                newUser.userToken=event.userToken;
+                newUser.stocksSubscribed=[];
+                //TODO:initialise subscribed news
+                newUser.save(function(err){if(err) console.error(err);});
+                return {success:true}
+            }
+            else{
+                console.log("earlier user found");
+                return {success:true};
+            }
+        })
     });
 }
