@@ -19,10 +19,4 @@ module.exports = function (app) {
             success:true
         }
     });
-
-    app.use(flock.eventTokenChecker);
-    flock.events.on('client.widgetAction', function(event) {
-        console.log('Hello');
-        res.sendfile("./../views/index.html");
-    })
 }

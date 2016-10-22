@@ -20,7 +20,7 @@ var configDB = require('./config/database.js');
 
 // set up our express application
 app.use(bodyParser()); // get information from html forms
-
+app.use(express.static(__dirname + '/app/views'));
 app.set('view engine', 'ejs'); // set up ejs for templating
 
 //
@@ -39,5 +39,5 @@ app.get('/', function(req, res) {
 });
 
 app.get('/liveWidget', function(req,res) {
-	res.sendfile('./app/views/index.html');
-})
+	res.sendFile('app/views/index.html', {root: __dirname});
+});
