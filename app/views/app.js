@@ -2,7 +2,7 @@ var webLiveApp = angular.module("webLive", []);
 
 webLiveApp
 	.constant("SERVER_CONFIG", {
-    "url": "http://172.16.67.209:9000"
+    "url": "http://54.149.242.88:9000"
   })
 	.controller('MainController', ['$scope', '$rootScope', '$interval', '$http', 'SERVER_CONFIG', 'SettingsService',
 	 	function($scope, $rootScope, $interval, $http, SERVER_CONFIG, SettingsService) {
@@ -215,14 +215,51 @@ webLiveApp
 		$scope.company = companyDetail.split('%22')[3];
 		console.log($scope.company);
 
+		//google charts code start
+    google.charts.load('current', {'packages':['line']});
+    google.charts.setOnLoadCallback(drawChart);
 
+	function drawChart() {
 		$http.get(SERVER_CONFIG.url+'/getprevdata',{params:{name:$scope.company,exchange:"NASDAQ"}})
-			.success(function(data){
-				console.log("got data successfully",JSON.stringify(data.data));
+			.success(function(response){
+				// console.log("got data successfully",JSON.stringify(response.data))
+                var data = new google.visualization.DataTable();                
+    						data.addColumn('date', 'Date');
+    						data.addColumn('number', $scope.company);
 
-			})
+                // data.addRows(response.data);
+                for(var i=0;i<response.data.length;i++){
+                	data.addRow([new Date(response.data[i][0]),response.data[i][1]])
+                }
+
+                // function drawChart() {
+                    //TODO:check when drawChart Function is called and if it fails, try doing the http call inside drawChart call and not outside it
+                    //var data = google.visualization.DataTable();
+
+                    //var options = {
+                    //    title: 'Company Performance',
+                    //    curveType: 'function',
+                    //    legend: { position: 'bottom' }
+                    //};
+                    var options = {
+                        chart: {
+                            title: '',
+                            subtitle: ''
+                        },
+                        width: window.innerWidth * 0.99,
+                        height: window.innerHeight * 0.99
+                    };
+
+                    // var chart = new google.visualization.LineChart(document.getElementById('stock_chart'));
+                    //TODO:try how this looks->
+                    var chart = new google.charts.Line(document.getElementById('stock_chart'));
+
+                    chart.draw(data, options);
+                // }
+            //google charts code end
+            })
 			.error(function(error){console.log("error is getting prev data",error)})
-
+		}
 	}])
 	.service('SettingsService', [function() {
 		var newsTopics = {};
