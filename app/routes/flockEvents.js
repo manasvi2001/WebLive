@@ -87,6 +87,18 @@ module.exports = function (app, request) {
         })
     });
 
+    flock.events.on('app.uninstall', function (event) {
+        console.log("app.uninstall called with->",JSON.stringify(event));
+        User.findOne({'userId': event.userId},function(err,user){
+            if(err)console.error(err);
+            user.remove(function(err) {
+            	if(err) console.error(err);
+            	console.log('User Removed');
+            });
+        })
+        return {success: true};
+    });
+
     flock.events.on('client.slashCommand', function(event) {
         console.log('client.slashCommand called with :: ' + JSON.stringify(event));
         if(event.text)
