@@ -75,7 +75,7 @@ module.exports = function (app, request) {
                     else if(!user) console.error("unable to save user successfully");
                     else{
                         console.log("Reached here yayyy");
-                        addStocks(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"IDEA",exchange:"NSE"},{name:"AAPL",exchange:"NASDAQ"}]);
+                        addStocks(user,[{name:"GOOGL",exchange:"NASDAQ"},{name:"AAPL",exchange:"NASDAQ"}]);
                     }
                 });
                 return {success:true}
