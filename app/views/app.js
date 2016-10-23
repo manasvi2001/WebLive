@@ -108,10 +108,13 @@ webLiveApp
 		// 		})
 		// }, 60000);
 	}])
+	.controller('GraphController', ['$scope', function($scope) {
+		// $scope.
+	}])
 	.service('SettingsService', [function() {
 		var newsTopics = {};
 		var numberWidgetUsed = 0;
-		var settings={};
+		var stocks={'AAPL','GOOGL','IDEA'};
 		settings.setNewsTopics = function(topics) {
 			newsTopics = topics;
 		};

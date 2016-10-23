@@ -57,3 +57,7 @@ app.get('/abc', function(req, res) {
 app.get('/liveWidget', function(req,res) {
 	res.sendFile('app/views/index.html', {root: __dirname});
 });
+
+app.get('/graph', function(req,res) {
+    res.sendFile('app/views/graph.html', {root: __dirname});
+})

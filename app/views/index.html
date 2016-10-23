@@ -12,11 +12,15 @@
 	<body ng-controller="MainController">
 		<div ng-if="!settingsView">
 			<div class="web-live-container-1">
-				<i class="ion-android-share" style="color: #ed473a"></i>
+				<i class="ion-arrow-graph-up-right" style="color: limegreen;"></i>&nbsp;Stocks
 				<i class="ion-android-settings" style="color: #697178; float: right; padding-right: 14px;" ng-click="openSettings()"></i>
 			</div>
 			<div class="web-live-container-2">
-				<i class="ion-arrow-graph-up-right" style="color: limegreen;"></i>&nbsp;Stocks
+				<select class="select-company">
+					<option ng-repeat="availableStock in availableStocks.NASDAQ">
+						{{availableStock}}
+					</option>
+				</select>
 				<i class="ion-edit" style="color: #697178; float: right; padding-right: 14px;" ng-click="editStocks()"></i>
 			</div>
 			<div class="stock-live-container-1" ng-repeat="stock in stockData">
