@@ -3,7 +3,7 @@ var stockUtils = require('./../utils/stockUtils.js');
 var Stock = require('./../models/stock');
 var request = require('request');
 
-module.exports = function (app) {
+module.exports = function (app,mongoose) {
     app.get("/stocklist",function(req,res){
         var obj=stockUtils.getStockList();
         res.json({success:true,result:obj});
@@ -51,10 +51,10 @@ module.exports = function (app) {
             else{
                 var stockIdArray=[];
                 for(var i=0;i<user.stocksSubscribed.length;i++){
-                    stockIdArray.push(user.stocksSubscribed[i].stockId)
+                    stockIdArray.push(mongoose.Types.ObjectId(user.stocksSubscribed[i].stockId));
                 }
                 console.log("user",JSON.stringify(user),"stockIdArray",JSON.stringify(stockIdArray))
-                Stock.find(stockIdArray,function(err,stocks){
+                Stock.find({'_id':{$in:stockIdArray}},function(err,stocks){
                     if(err)console.error(err);
                     //console.log("all stocks",stocks);
                     return res.json({success:true,stocks:stocks});
