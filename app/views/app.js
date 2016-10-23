@@ -19,6 +19,7 @@ webLiveApp
     $scope.input = {
     	percentage: '0.5'
     };
+    $scope.newsData = [];
 		$scope.stockData = [];
 		$scope.settingsView = false;
 		$scope.editStock = false;
@@ -160,15 +161,46 @@ webLiveApp
             }
 
             //TODO:getting news
-            $http.get("https://newsapi.org/v1/articles?source=techcrunch&sortBy=latest&apiKey=1d2ddc55904c428cbb8b3b6c01856730")
-                .success(function(data){
-                    console.log("got news data length->",data.articles.length)
-                })
-                .error(function(error){
-                    console.log('error in getting news',error);
-                })
+    $http.get("https://newsapi.org/v1/articles?source=techcrunch&sortBy=latest&apiKey=1d2ddc55904c428cbb8b3b6c01856730")
+      .success(function(data){
+        console.log("got news data length->",data.articles.length)
+        $rootScope.safeApply(function() {
+        	$scope.newsData = data.articles.slice(0,5);
+        });
+      })
+      .error(function(error){
+        console.log('error in getting news',error);
+      })
 
 	}])
+
+	.filter('filterTime', ['$filter', function($filter) {
+    return function(input) {
+      if(!input) {
+        return "";
+      }
+      var currDate = new Date(Date.now());
+      var inputDate = new Date(input);
+      var diffDate = Math.abs(currDate.getTime()-inputDate.getTime());
+      var diffHrs = Math.floor(diffDate/(1000 * 60 * 60));
+
+      if(diffHrs < 24) {
+        return diffHrs.toString() + "h";
+      }
+
+      var diffDays = Math.floor(diffHrs/24);
+
+      if(diffDays<31)
+        return diffDays.toString() + "d";
+
+      var diffMonths=Math.floor(diffDays/31);
+
+      if(diffMonths<12)
+        return diffMonths.toString()+"mo";
+
+      return Math.floor(diffMonths/12).toString()+"y";
+    }
+  }])
 	.controller('GraphController', ['$scope','$http', 'SERVER_CONFIG', function($scope, $http, SERVER_CONFIG) {
 		// $scope.
 		var query = window.location.href;
@@ -186,7 +218,8 @@ webLiveApp
 
 		$http.get(SERVER_CONFIG.url+'/getprevdata',{params:{name:$scope.company,exchange:"NASDAQ"}})
 			.success(function(data){
-				console.log("got data successfully",JSON.stringify(data.data))
+				console.log("got data successfully",JSON.stringify(data.data));
+
 			})
 			.error(function(error){console.log("error is getting prev data",error)})
 

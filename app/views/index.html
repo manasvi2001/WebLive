@@ -12,6 +12,16 @@
 	<body ng-controller="MainController">
 		<div ng-if="!settingsView">
 			<div class="web-live-container-1">
+				<i class="ion-ios-paper" style="color: #2976d1;"></i>&nbsp;News
+			</div>
+			<div class="stock-live-container-1" ng-repeat="news in newsData">
+				<a class="news-title" href="{{news.url}}">{{news.title}}</a>
+				<span class="news-publisher">TechCrunch</span>
+				<span class="news-publisher">{{news.publishedAt | filterTime}}</span>
+			</div>
+		</div>
+		<div ng-if="!settingsView">
+			<div class="web-live-container-1">
 				<i class="ion-arrow-graph-up-right" style="color: limegreen;"></i>&nbsp;Stocks
 				<i class="ion-android-settings" style="color: #697178; float: right; padding-right: 14px;" ng-click="openSettings()"></i>
 			</div>
@@ -23,8 +33,8 @@
 			<div class="stock-live-container-1" ng-repeat="stock in stockData">
 				<span class="stock-delete" ng-if="editStock" ng-click="deleteStock(stock.name, stock.exchange)"><i class="ion-minus-circled"></i></span>
 				<span class="stock-live-name">{{stock.name}}</span>
-				<span class="stock-live-differential" align="center" ng-if="stock.percentChange>=0">&nbsp;{{stock.percentChange}} %&nbsp;</span>
-				<span class="stock-live-differential-negative" align="center" ng-if="stock.percentChange<0">&nbsp;{{stock.percentChange}} %&nbsp;</span>
+				<span class="stock-live-differential" align="center" ng-if="stock.percentChange>=0">{{stock.percentChange}}%</span>
+				<span class="stock-live-differential-negative" align="center" ng-if="stock.percentChange<0">{{stock.percentChange}}%</span>
 				<span class="stock-live-price" align="center">{{stock.lastPrice}}&nbsp;&nbsp;&nbsp;</span>
 			</div>
 		</div>

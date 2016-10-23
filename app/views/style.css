@@ -66,3 +66,12 @@ body {
 .stock-delete {
 	color: #ed473a;
 }
+
+.news-title {
+	color: #2976d1;
+	text-decoration: none;
+}
+
+.news-publisher {
+	color: #6c747a;
+}
