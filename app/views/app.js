@@ -138,6 +138,15 @@ webLiveApp
                     console.log("failed removing stock",error);
                 })
 
+            //TODO:getting news
+            $http.get("https://newsapi.org/v1/articles?source=techcrunch&sortBy=latest&apiKey=1d2ddc55904c428cbb8b3b6c01856730")
+                .success(function(data){
+                    console.log("got news data length->",data.articles.length)
+                })
+                .error(function(error){
+                    console.log('error in getting news',error);
+                })
+
 	}])
 	.controller('GraphController', ['$scope', function($scope) {
 		// $scope.
