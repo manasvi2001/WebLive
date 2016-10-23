@@ -3,7 +3,7 @@ var stockUtils = require('./../utils/stockUtils.js');
 var Stock = require('./../models/stock');
 var request = require('request');
 
-module.exports = function (app) {
+module.exports = function (app,mongoose) {
     app.get("/stocklist",function(req,res){
         var obj=stockUtils.getStockList();
         res.json({success:true,result:obj});
