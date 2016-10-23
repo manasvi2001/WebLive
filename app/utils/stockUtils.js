@@ -1,5 +1,4 @@
 var request     = require("request");
-var Q = require("q");
 var Stock = require('./../models/stock');
 
 exports.getCurrentPrice = function getCurrentPrice(name,exchange,stock,callback){
