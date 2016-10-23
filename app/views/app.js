@@ -22,6 +22,9 @@ webLiveApp
 		$scope.stockData = [];
 		$scope.settingsView = false;
 		$scope.editStock = false;
+		$scope.editStocks = function() {
+			$scope.editStock = !$scope.editStock;
+		}
 		$scope.setThreshold = function() {
 			console.log("pressed enter");
 			// set threshold
@@ -94,7 +97,7 @@ webLiveApp
 				.error(function(error) {
 					console.log(JSON.stringify(error));
 				})
-		}, 60000);
+		}, 120000);
 		// $interval(function() {
 		// 	var parameters = {
 		// 		userId: $scope.userId
@@ -122,21 +125,39 @@ webLiveApp
                 })
 
             //TODO:adding a new stock to db
-            $http.post(SERVER_CONFIG.url+'/addstock',{userId:$scope.userId,stockName:$scope.newStockName,stockExchange:"NASDAQ"})
+            $scope.hasChanged = function(selected) {
+            	$http.post(SERVER_CONFIG.url+'/addstock',{userId:$scope.userId,stockName:selected,stockExchange:"NASDAQ"})
                 .success(function(data){
                     console.log("added stock successfully",data.lastPrice,data.percentChange);
+                    $rootScope.safeApply(function() {
+                    	$scope.stockData.push({lastPrice:data.lastPrice, name: selected, exchange: "NASDAQ", percentChange: data.percentChange.toFixed(4)});
+                    	$scope.input.selected = '';
+                    })
                 })
                 .error(function(error){
                     console.log("failed adding stock",error);
                 })
+            }
             //TODO:deleting a stock to db
-            $http.post(SERVER_CONFIG.url+'/removestock',{userId:$scope.userId,stockName:$scope.oldStockName,stockExchange:$scope.oldStockExchange})
-                .success(function(data){
-                    console.log("remove stock successfully");
-                })
-                .error(function(error){
-                    console.log("failed removing stock",error);
-                })
+            $scope.deleteStock = function(name, exchange) {
+            	console.log(name + ' ' + exchange);
+	            $http.post(SERVER_CONFIG.url+'/removestock',{userId:$scope.userId,stockName:name,stockExchange:exchange})
+	                .success(function(data){
+	                    console.log("remove stock successfully");
+	                    $rootScope.safeApply(function() {
+	                    	for(var i=0;i<$scope.stockData.length;i++) {
+	                    		var stock = $scope.stockData[i];
+	                    		if(stock.name == name && stock.exchange == exchange) { 
+	                    			$scope.stockData.splice(i,1);
+	                    			break;
+	                    		}
+	                    	}
+	                    })
+	                })
+	                .error(function(error){
+	                    console.log("failed removing stock",error);
+	                })
+            }
 
             //TODO:getting news
             $http.get("https://newsapi.org/v1/articles?source=techcrunch&sortBy=latest&apiKey=1d2ddc55904c428cbb8b3b6c01856730")
@@ -148,13 +169,33 @@ webLiveApp
                 })
 
 	}])
-	.controller('GraphController', ['$scope', function($scope) {
+	.controller('GraphController', ['$scope','$http', 'SERVER_CONFIG', function($scope, $http, SERVER_CONFIG) {
 		// $scope.
+		var query = window.location.href;
+		var companyDetail = "";
+		$scope.company = "";
+		query = query.split('%2C');
+		for(var i=0;i<query.length;i++) {
+			if(query[i].match(/attachmentId/g)) {
+				companyDetail = query[i];
+			}
+		}
+		$scope.company = companyDetail.split('%22')[3];
+		console.log($scope.company);
+
+
+		$http.get(SERVER_CONFIG.url+'/getprevdata',{params:{name:$scope.company,exchange:"NASDAQ"}})
+			.success(function(data){
+				console.log("got data successfully",JSON.stringify(data.data))
+			})
+			.error(function(error){console.log("error is getting prev data",error)})
+
 	}])
 	.service('SettingsService', [function() {
 		var newsTopics = {};
 		var numberWidgetUsed = 0;
-		var stocks={'AAPL','GOOGL','IDEA'};
+		var stocks=['AAPL','GOOGL','IDEA'];
+		var settings={};
 		settings.setNewsTopics = function(topics) {
 			newsTopics = topics;
 		};

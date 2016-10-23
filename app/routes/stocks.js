@@ -28,7 +28,7 @@ module.exports = function (app) {
             var data=[];
             for(var i=7;i<bodySplit.length-1;i++){
                 if(!isNaN(bodySplit[i]))
-                    data.push(Number(bodySplit[i]));
+                    data.push([currentUnixTime+(i-7)*1000*60,Number(bodySplit[i])]);
             }
 
 
@@ -80,7 +80,7 @@ module.exports = function (app) {
             else{
                 var alreadyAddedFlag=false;
                 for(var i=0;i<user.stocksSubscribed.length;i++){
-                    if(user.stocksSubscribed[i].name==stockName && user.stocksSubscribed[i].name==stockExchange) {
+                    if(user.stocksSubscribed[i].name==stockName && user.stocksSubscribed[i].exchange==stockExchange) {
                         alreadyAddedFlag = true;
                         break;
                     }
@@ -120,15 +120,21 @@ module.exports = function (app) {
             else {
                 var indexNo = -1;
                 for (var i = 0; i < user.stocksSubscribed.length; i++) {
-                    if (user.stocksSubscribed[i].name == stockName && user.stocksSubscribed[i].name == stockExchange) {
+                    if (user.stocksSubscribed[i].name == stockName && user.stocksSubscribed[i].exchange == stockExchange) {
                         indexNo=i;
                         break;
                     }
                 }
-                if(indexNo>0)
+                console.log("indexNo " + indexNo);
+                if(indexNo>=0) {
+                    console.log("before :: " + JSON.stringify(user.stocksSubscribed))
                     user.stocksSubscribed.splice(indexNo,1);
-                user.save(function(err){if(err) console.error(err);});
-                res.json({success:true,message:"stock removed successfully"});
+                    console.log("after :: " + JSON.stringify(user.stocksSubscribed))
+                    user.save(function(err){if(err) console.error(err);});
+                    res.json({success:true,message:"stock removed successfully"});
+                } else {
+                    res.json({success:false, message: "stock just cant be removed"});
+                }
             }
         })
 

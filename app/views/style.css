@@ -62,3 +62,7 @@ body {
 .select-company {
 	background-color: #fff;
 }
+
+.stock-delete {
+	color: #ed473a;
+}

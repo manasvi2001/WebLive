@@ -16,33 +16,44 @@ module.exports = function (app, request) {
     //app.use(flock.eventTokenChecker);
 
     var sendMessage = function(userId, token, company) {
-    	var options = {
-    		url: "https://api.flock.co/v1/chat.sendMessage",
-    		json: {
-			    'to': userId,
-			    'token': token,
-			    'text': 'Stock Price of ' + company.toUpperCase(),
-			    'attachments': [{
-			    	'title': 'Stock Price of ' + company.toUpperCase(),
-			    	'views': {
-			    		'flockml': "<flockml>Hello <strong>foobar</strong>, Welcome to <a href=\"https://flock.co/\">Flock!</a></flockml>"
-			    	},
-			    	"buttons": [{
-			        "name": "View details",
-			        "action": { "type": "openWidget", "desktopType": "modal", "mobileType": "modal", "url": "http://172.16.67.209:9000/graph" }
-				    }]
-			    }]
-			  }
-    	}
-			request(options, function(error, response, body) {
-				if(error) {
-					return console.log('Error: ' + error);
-				}
-				if(response.statusCode != 200) {
-					return console.log('Invalid' + response.statusCode);
-				}
-				console.log(body);
-			});
+    	var newStock=Stock();
+    	stockUtils.getCurrentPrice(company,"NASDAQ",newStock,function(err,price,percentChange){
+    		var stock={lastPrice:price,name:company,percentChange:percentChange.toFixed(4)};
+    		var html1="<span style=\"width: 30%;\">" + stock.name + "</span>";
+    		if(stock.percentChange>=0)var html2="<span style=\"float: right;width: 30%;border: thin solid #6ada39;background-color: #6ada39;border-radius: 2px;\" align=\"center\">&nbsp;" + stock.percentChange + " %&nbsp;</span>";
+    		else var html2="<span style=\"float: right;width: 30%;border: thin solid #ed473a;background-color: #ed473a;border-radius: 2px;\" align=\"center\">&nbsp;" + stock.percentChange + " %&nbsp;</span>";
+    		var html3="<span style=\"float: right;width: 40%;\" align=\"center\">" + stock.lastPrice + "&nbsp;&nbsp;&nbsp;</span>"
+  					var options = {
+		    		url: "https://api.flock.co/v1/chat.sendMessage",
+		    		json: {
+					    'to': userId,
+					    'token': token,
+					    'attachments': [{
+					    	'id': company.toUpperCase(),
+					    	'title': 'Stock Price of ' + company.toUpperCase(),
+					    	'views': {
+					    		"html": { 
+					    			"inline": html1 + html2 + html3,
+					    			"height": 40,
+					    		}
+					    	},
+					    	"buttons": [{
+					        "name": "View details",
+					        "action": { "type": "openWidget", "desktopType": "modal", "mobileType": "modal", "url": "http://172.16.67.209:9000/graph"}
+						    }]
+					    }]
+					  }
+		    	}
+					request(options, function(error, response, body) {
+						if(error) {
+							return console.log('Error: ' + error);
+						}
+						if(response.statusCode != 200) {
+							return console.log('Invalid' + response.statusCode);
+						}
+						console.log(body);
+					});
+    	})
 		}
 
     app.post('/events', flock.router);
@@ -79,10 +90,16 @@ module.exports = function (app, request) {
     flock.events.on('client.slashCommand', function(event) {
         console.log('client.slashCommand called with :: ' + JSON.stringify(event));
         if(event.text)
-        	var company = event.text.slice(1);
+        	var company = event.text.slice(1).toUpperCase();
+
+        var companyList=stockUtils.getStockList().NASDAQ;
+
         User.findOne({'userId': event.userId}, function(err, user) {
         	if(err) console.error(err);
         	var token = user.userToken;
+        	if(companyList.indexOf(company)==-1){
+						return {success: false};
+	        }
 	        if(event.chat[0] == 'g'){
 	            //get group info
 	            request('https://api.flock.co/v1/groups.getMembers?groupId=' + event.chat + '&token=' + token, function (error, response, body) {
