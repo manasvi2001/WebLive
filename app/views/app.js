@@ -107,6 +107,37 @@ webLiveApp
 
 		// 		})
 		// }, 60000);
+
+
+            //TODO:getting list of all stocks
+            $http.get(SERVER_CONFIG.url + '/stocklist')
+                .success(function(data) {
+                    console.log("list of stocks available are available->",JSON.stringify(data));
+                    $rootScope.safeApply(function() {
+                        $scope.availableStocks = data.result;
+                    });
+                })
+                .error(function(error) {
+                    console.log(JSON.stringify(error));
+                })
+
+            //TODO:adding a new stock to db
+            $http.post(SERVER_CONFIG.url+'/addstock',{userId:$scope.userId,stockName:$scope.newStockName,stockExchange:"NASDAQ"})
+                .success(function(data){
+                    console.log("added stock successfully",data.lastPrice,data.percentChange);
+                })
+                .error(function(error){
+                    console.log("failed adding stock",error);
+                })
+            //TODO:deleting a stock to db
+            $http.post(SERVER_CONFIG.url+'/removestock',{userId:$scope.userId,stockName:$scope.oldStockName,stockExchange:$scope.oldStockExchange})
+                .success(function(data){
+                    console.log("remove stock successfully");
+                })
+                .error(function(error){
+                    console.log("failed removing stock",error);
+                })
+
 	}])
 	.controller('GraphController', ['$scope', function($scope) {
 		// $scope.

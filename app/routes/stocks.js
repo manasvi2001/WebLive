@@ -90,6 +90,7 @@ module.exports = function (app) {
                     stockUtils.getCurrentPrice(stockName,stockExchange,newStock,function(err,newPrice,percentChange) {
                         if (err)console.error(err);
                         console.log("got result from util function of price & percent of ", newPrice, percentChange);
+                        res.json({success:true,message:"stock added successfully",lastPrice:newPrice,percentChange:percentChange});
                     });
                     user.stocksSubscribed.push({
                         name:stockName,
@@ -97,7 +98,6 @@ module.exports = function (app) {
                         stockId:newStock._id.toString()
                     });
                     user.save(function(err){if(err) console.error(err);});
-                    res.json({success:true,message:"stock added successfully",lastPrice:newPrice,percentChange:percentChange});
 
                 }
             }
