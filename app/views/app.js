@@ -185,9 +185,42 @@ webLiveApp
 
 
 		$http.get(SERVER_CONFIG.url+'/getprevdata',{params:{name:$scope.company,exchange:"NASDAQ"}})
-			.success(function(data){
-				console.log("got data successfully",JSON.stringify(data.data))
-			})
+			.success(function(response){
+				console.log("got data successfully",JSON.stringify(response.data))
+                //google charts code start
+                google.charts.load('current', {'packages':['corechart']});
+                google.charts.setOnLoadCallback(drawChart);
+                data.addColumn('number', 'Date');
+                data.addColumn('number', $scope.company);
+
+                data.addRows(response.data);
+
+                function drawChart() {
+                    //TODO:check when drawChart Function is called and if it fails, try doing the http call inside drawChart call and not outside it
+                    //var data = google.visualization.DataTable();
+
+                    //var options = {
+                    //    title: 'Company Performance',
+                    //    curveType: 'function',
+                    //    legend: { position: 'bottom' }
+                    //};
+                    var options = {
+                        chart: {
+                            title: '',
+                            subtitle: ''
+                        },
+                        width: 900,
+                        height: 500
+                    };
+
+                    //var chart = new google.visualization.LineChart(document.getElementById('stock_chart'));
+                    //TODO:try how this looks->
+                    var chart = new google.charts.Line(document.getElementById('stock_chart'));
+
+                    chart.draw(data, options);
+                }
+            //google charts code end
+            })
 			.error(function(error){console.log("error is getting prev data",error)})
 
 	}])
