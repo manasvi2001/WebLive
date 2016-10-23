@@ -39,7 +39,7 @@ module.exports = function (app, request) {
 					    	},
 					    	"buttons": [{
 					        "name": "View details",
-					        "action": { "type": "openWidget", "desktopType": "modal", "mobileType": "modal", "url": "http://172.16.67.209:9000/graph"}
+					        "action": { "type": "openWidget", "desktopType": "modal", "mobileType": "modal", "url": "http://54.149.242.88:9000/graph"}
 						    }]
 					    }]
 					  }
